@@ -18,7 +18,10 @@ def analyze_run(id):
   try:
    batch,points=batch_data(db,run.batch_id);result=analyze(batch,points,run.config)
    Path(ARTIFACT_DIR).mkdir(parents=True,exist_ok=True);Path(ARTIFACT_DIR,f'thermal-{id}.json').write_text(json.dumps(result,ensure_ascii=False,allow_nan=False))
-   for segment in result['segments']:db.add(Segment(run_id=id,**{k:segment[k] for k in ('position','start','end','mean','rss')}))
+   for segment in result['segments']:
+    values={k:segment[k] for k in ('position','start','end','mean','rss')}
+    if result.get('study_mode')=='duration':values.update(duration_seconds=segment['duration_seconds'],start_time=segment['start_time'],end_time=segment['end_time'])
+    db.add(Segment(run_id=id,**values))
    run.result=result;run.status='succeeded';run.error=None;db.commit();record(db,'worker','run.succeeded',{'run_id':id,'segments_count':result['segments_count']})
   except Exception as e:
    db.rollback();run=db.get(SegmentationRun,id);run.status='failed';run.error=str(e)[:1000];db.commit();record(db,'worker','run.failed',{'run_id':id,'error':run.error})

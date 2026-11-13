@@ -1,1 +1,23 @@
-import {number} from '../utils/format';import {Table} from './common/Table';export function PenaltyPath({result}:{result:any}){return <section className="section"><div className="section-heading"><h2>同一 DP，预设罚项路径。</h2><span>frontier 构建 {result.dp_builds} 次</span></div><p>所有 β 复用最优 RSS[K,n]；路径是参数敏感性，不是断点置信区间。</p><Table headers={['预设罚项 β','选中段数','断点（左段累计样本数）','RSS','总目标']} >{result.penalty_path.map(p=><tr key={p.penalty} className={p.penalty===result.penalty?'selected-row':''}><td>{number(p.penalty,4)}{p.penalty===result.penalty&&' ← 当前'}</td><td>{p.segments_count}</td><td>{p.breakpoints.join(' / ')||'无断点'}</td><td>{number(p.rss,4)}</td><td>{number(p.objective,4)}</td></tr>)}</Table><details><summary>查看每个可行 K 的最优 RSS</summary><p>{result.rss_frontier.map(p=>`K${p.segments_count}: ${number(p.optimal_rss,4)}`).join('　/　')}</p></details></section>}
+import {number} from '../utils/format';
+import {Table} from './common/Table';
+export function PenaltyPath({result}:{result:any}){
+ const isDuration=result.study_mode==='duration';
+ return <section className="section">
+  <div className="section-heading">
+   <h2>同一 DP，预设罚项路径。</h2>
+   <span>frontier 构建 {result.dp_builds} 次</span>
+  </div>
+  <p>所有 β 复用最优 RSS[K,n]；路径是参数敏感性，不是断点置信区间。{isDuration?'断点为左段累计样本数，对应时刻见分段表的区间起止。':''}</p>
+  <Table headers={['预设罚项 β','选中段数','断点（左段累计样本数）','RSS'+(isDuration?'（°C²·秒）':''),'总目标']}>
+   {result.penalty_path.map((p:any)=>
+    <tr key={p.penalty} className={p.penalty===result.penalty?'selected-row':''}>
+     <td>{number(p.penalty,4)}{p.penalty===result.penalty&&' ← 当前'}</td>
+     <td>{p.segments_count}</td>
+     <td>{p.breakpoints.join(' / ')||'无断点'}</td>
+     <td>{number(p.rss,4)}</td>
+     <td>{number(p.objective,4)}</td>
+    </tr>)}
+  </Table>
+  <details><summary>查看每个可行 K 的最优 RSS</summary><p>{result.rss_frontier.map((p:any)=>`K${p.segments_count}: ${number(p.optimal_rss,4)}`).join('　/　')}</p></details>
+ </section>;
+}

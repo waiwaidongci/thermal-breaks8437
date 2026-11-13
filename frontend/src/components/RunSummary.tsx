@@ -1,1 +1,12 @@
-import {number} from '../utils/format';export function RunSummary({result}:{result:any}){return <div className="run-summary"><div><small>样本 / 最小段长</small><strong>{result.n}<em> / {result.min_size}</em></strong></div><div><small>选中段数 / 可行上界</small><strong>{result.segments_count}<em> / {result.feasible_max_segments}</em></strong></div><div><small>RSS</small><strong>{number(result.rss,3)}</strong></div><div><small>罚项 β / 总目标</small><strong>{number(result.penalty,2)}<em> / {number(result.objective,2)}</em></strong></div></div>}
+import {number,duration} from '../utils/format';
+export function RunSummary({result}:{result:any}){
+ const isDuration=result.study_mode==='duration';
+ return <div className="run-summary">
+  {isDuration
+   ?<div><small>研究窗口总时长 / 最短段长（秒）</small><strong>{number(result.total_duration_seconds,1)}<em> / {number(result.min_duration,1)}</em></strong></div>
+   :<div><small>样本 / 最小段长</small><strong>{result.n}<em> / {result.min_size}</em></strong></div>}
+  <div><small>选中段数 / 可行上界</small><strong>{result.segments_count}<em> / {result.feasible_max_segments}</em></strong></div>
+  <div><small>RSS{isDuration?'（°C²·秒）':''}</small><strong>{number(result.rss,3)}</strong></div>
+  <div><small>罚项 β / 总目标</small><strong>{number(result.penalty,2)}<em> / {number(result.objective,2)}</em></strong></div>
+ </div>;
+}

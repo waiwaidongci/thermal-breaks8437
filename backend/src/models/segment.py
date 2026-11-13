@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped,mapped_column
-from sqlalchemy import ForeignKey,Float,UniqueConstraint
+from sqlalchemy import ForeignKey,Float,String,UniqueConstraint
 from src.config.database import Base
 class Segment(Base):
  __tablename__='segments'
@@ -11,3 +11,7 @@ class Segment(Base):
  end:Mapped[int]=mapped_column()
  mean:Mapped[float]=mapped_column(Float)
  rss:Mapped[float]=mapped_column(Float)
+ # Duration-study columns only; null for historical point-count runs.
+ duration_seconds:Mapped[float|None]=mapped_column(Float,nullable=True)
+ start_time:Mapped[str|None]=mapped_column(String(40),nullable=True)
+ end_time:Mapped[str|None]=mapped_column(String(40),nullable=True)
